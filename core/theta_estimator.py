@@ -1,21 +1,28 @@
 import numpy as np
-from scipy.optimize import minimize
-from core.irt_model import IRTModel
 
-class ThetaEstimator:
-    def __init__(self, prior_mean=0.0, prior_std=1.5):
-        self.mu = prior_mean
-        self.sigma = prior_std
+def theta_update_single_item(
+    theta,
+    item,
+    response,
+    lr=0.8,
+    max_step=1.0,
+    use_map=False,
+    prior_var=1.5
+):
+    a, b, c = item.a, item.b, item.c
 
-    def estimate(self, theta_init, items, responses):
-        def loss(theta):
-            ll = 0.0
-            for item, u in zip(items, responses):
-                p = IRTModel.probability(theta, item)
-                ll += u * np.log(p) + (1 - u) * np.log(1 - p)
+    # Numerik stabilite
+    z = np.clip(a * (theta - b), -10, 10)
+    P = c + (1 - c) / (1 + np.exp(-z))
 
-            prior = (theta - self.mu)**2 / (2 * self.sigma**2)
-            return -ll + prior
+    # Likelihood gradient
+    grad = a * (response - P)
 
-        result = minimize(loss, theta_init, bounds=[(-4, 4)])
-        return result.x[0]
+    # MAP desteği (opsiyonel)
+    if use_map:
+        grad -= theta / prior_var
+
+    delta = lr * grad
+    delta = np.clip(delta, -max_step, max_step)
+
+    return delta
