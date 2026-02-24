@@ -22,7 +22,7 @@ def build_item_bank(json_path: str) -> list[Item]:
                         options=q["options"],
                         answer=q["answer"],
                         a=float(q["discrimination"]),
-                        b=difficulty_map.get(level_name.upper(),0.0),
+                        b=difficulty_map.get(level_name.upper()),
                         c=0.2
                     )
                     item_bank.append(item)
