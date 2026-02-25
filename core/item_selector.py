@@ -1,6 +1,6 @@
 from core.irt_model import fisher_information_3pl
 
-
+# ITEM SELECTION FOR MIRT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! HERE!!!!!!!!!
 def select_next_item_max_FI(
         used_item_ids,
         item_bank,

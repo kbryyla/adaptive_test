@@ -1,10 +1,10 @@
-from core.theta_estimator import theta_update_subtopic
-
+from core.irt_model import mle
 
 class StudentState:
     def __init__(self):
         # Topic bazlı yetenek
         self.theta_topic = {}
+        self.theta_general = 0.0      #LAZY PROPERTY!!!!!!!! BURDASINNN.
 
         # Cevap ve madde geçmişi
         self.responses_by_topic = {}
@@ -31,17 +31,26 @@ class StudentState:
         self.asked_items.append(item)
         self.responses.append(response)
 
+    def update_theta_general(self):
+        if len(self.asked_items) == 0:
+            return 0.0
+        else:
+            self.theta_general = mle(self.asked_items, self.responses)
+
+        return self.theta_general
+
     def update_subtopic_thetas(self):
-        thetas = {}
 
         for topic in self.asked_items_by_topic:
             items = self.asked_items_by_topic[topic]
             responses = self.responses_by_topic[topic]
 
-            if len(items) > 0:
-                theta = theta_update_subtopic(items,responses)
-                thetas[topic] = theta
-        return thetas
+            if len(items) == 0:
+                self.theta_topic[topic] = 0.0
+            else:
+                self.theta_topic[topic] = mle(items,responses)
+
+        return self.theta_topic
 
     def asked_count(self, topic):
         return len(self.asked_items_by_topic.get(topic, []))
