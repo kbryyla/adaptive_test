@@ -1,4 +1,5 @@
-from core.irt_model import mle
+from core.irt_model import mle, fisher_information_3pl
+
 
 class StudentState:
     def __init__(self):
@@ -12,6 +13,10 @@ class StudentState:
 
         self.responses = []
         self.asked_items = []
+
+
+        #topic based total FI
+        self.information_by_topic = {}
 
 
 
@@ -30,6 +35,13 @@ class StudentState:
         #global record
         self.asked_items.append(item)
         self.responses.append(response)
+
+
+        if topic not in self.information_by_topic:
+            self.information_by_topic[topic] = 0.0
+        info = fisher_information_3pl(self.get_theta(topic),item.a,item.b,item.c)
+        self.information_by_topic[topic] += info
+
 
     def update_theta_general(self):
         if len(self.asked_items) == 0:
