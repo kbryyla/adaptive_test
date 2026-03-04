@@ -1,5 +1,7 @@
 import numpy as np
 from scipy.optimize import minimize_scalar
+from scipy.stats import norm
+
 
 def irt_3pl(theta, a, b, c=0.2):
     z = np.clip(a * (theta - b), -35, 35)
@@ -25,6 +27,24 @@ def mle(items,responses):
     )
     return res.x
 
+
+def map_estimate(items, responses, prior_mu=0.0, prior_sigma=1.0):
+
+    theta_grid = np.linspace(-4, 4, 1000)
+    posterior = []
+
+    for theta in theta_grid:
+        # Likelihood
+        p_list = [item.c + (1 - item.c) / (1 + np.exp(-1.7*item.a*(theta - item.b)))
+                  for item in items]
+        likelihood = np.prod([p if r==1 else 1-p for p,r in zip(p_list, responses)])
+
+        # Prior
+        prior = norm.pdf(theta, prior_mu, prior_sigma)
+
+        posterior.append(likelihood * prior)
+
+    return theta_grid[np.argmax(posterior)]
 
 def fisher_information_3pl(theta, a, b, c=0.2):
     p = irt_3pl(theta, a, b, c)

@@ -1,11 +1,13 @@
-from core.item_selector import select_next_item_max_FI, select_next_item_topic_based
-#from core.theta_estimator import theta_update_general
+from core.item_selector import select_next_item_topic_based
 from session.student import StudentState
 from utils.loader import build_item_bank
 
 
 item_bank = build_item_bank("data/erisim_guvenligi_sorulari.json")
-
+"""topics = set()
+for item in item_bank:
+    topics.add(item.sub_topic)
+print(topics)"""
 
 max_questions = 10
 used_item_ids = set()
@@ -53,17 +55,17 @@ while True:
 
     correct_text = "DOĞRU" if response == 1 else "YANLIŞ"
     print(f"Cevabınız: {correct_text}")
-    print("güncel theta",current_theta)
+    print(f"güncel theta {current_theta:.3f}")
 
     #print(type[student.asked_items_by_topic.values()[0]])
     subtopic_thetas = student.update_subtopic_thetas()
 
     for topic, theta in subtopic_thetas.items():
-        print(topic, theta)
+        print(topic, f"{theta:.3f}")
 
     # Kaç soru soruldu?
     total_asked = student.total_items_asked()
 
     if total_asked >= max_questions:
-        print("theta score: ", current_theta)
+        print(f"theta score: {current_theta:.3f}")
         break

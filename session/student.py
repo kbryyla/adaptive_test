@@ -1,4 +1,4 @@
-from core.irt_model import mle, fisher_information_3pl
+from core.irt_model import mle, fisher_information_3pl, map_estimate
 
 
 class StudentState:
@@ -47,7 +47,7 @@ class StudentState:
         if len(self.asked_items) == 0:
             return 0.0
         else:
-            self.theta_general = mle(self.asked_items, self.responses)
+            self.theta_general = map_estimate(self.asked_items, self.responses)
 
         return self.theta_general
 
@@ -60,7 +60,7 @@ class StudentState:
             if len(items) == 0:
                 self.theta_topic[topic] = 0.0
             else:
-                self.theta_topic[topic] = mle(items,responses)
+                self.theta_topic[topic] = map_estimate(items,responses)
 
         return self.theta_topic
 
