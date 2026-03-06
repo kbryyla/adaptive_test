@@ -1,10 +1,13 @@
 from core.irt_model import mle, fisher_information_3pl, map_estimate
+from utils.topic_graph import all_skill_ids
 
-
+"""
+skill_id ekleme kısmı battı, tekrar dönücem.
+"""
 class StudentState:
     def __init__(self):
         # Topic bazlı yetenek
-        self.theta_topic = {}
+        self.theta_topic = {skill_id: 0.0 for skill_id in all_skill_ids}
         self.theta_general = 0.0      #LAZY PROPERTY!!!!!!!! BURDASINNN.
 
         # Cevap ve madde geçmişi
@@ -71,8 +74,8 @@ class StudentState:
         return len(self.asked_items)
 
 
-    def get_theta(self, topic):
-        return self.theta_topic.get(topic, 0.0)
+    def get_theta(self, skill_id):
+        return self.theta_topic.get(skill_id, 0.0)
 
-    def set_theta(self, topic, value):
-        self.theta_topic[topic] = float(value)
+    def set_theta(self, skill_id, value):
+        self.theta_topic[skill_id] = value

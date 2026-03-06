@@ -1,7 +1,7 @@
 from core.item_selector import select_next_item_topic_based
 from session.student import StudentState
 from utils.loader import build_item_bank
-
+from utils.topic_graph import propagate_theta, G
 
 item_bank = build_item_bank("data/erisim_guvenligi_sorulari.json")
 """topics = set()
@@ -18,7 +18,7 @@ letters = ["A", "B", "C", "D", "E"]
 while True:
     item = select_next_item_topic_based(student,item_bank)
 
-    #MPI and DISTANCE FOR NEXT ITEM SELECTION CONTINUING...
+
 
     if item is None:
         print("item not found!")
@@ -59,6 +59,10 @@ while True:
 
     #print(type[student.asked_items_by_topic.values()[0]])
     subtopic_thetas = student.update_subtopic_thetas()
+    print(item.sub_topic in G.nodes)
+    print(item.sub_topic)
+    for skill_id in subtopic_thetas:
+        propagate_theta(G, student, skill_id)
 
     for topic, theta in subtopic_thetas.items():
         print(topic, f"{theta:.3f}")
