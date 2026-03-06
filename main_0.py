@@ -1,7 +1,8 @@
+from core.irt_model import map_estimate
 from core.item_selector import select_next_item_topic_based
 from session.student import StudentState
 from utils.loader import build_item_bank
-from utils.topic_graph import propagate_theta, G
+from utils.topic_graph import propagate_theta, G, skill_id_to_text
 
 item_bank = build_item_bank("data/erisim_guvenligi_sorulari.json")
 """topics = set()
@@ -50,6 +51,17 @@ while True:
     response = 1 if user_letter == correct_letter else 0
     # cevabı kaydet
     student.register_response(item, response)
+    # 1. item.sub_topic → skill_id map
+    subtopic_to_id = {v: k for k, v in skill_id_to_text.items()}
+
+    # 2. Cevap sonrası theta güncelle
+    for topic, responses in student.responses_by_topic.items():
+        items = student.asked_items_by_topic[topic]
+        for item, response in zip(items, responses):
+            skill_id = subtopic_to_id.get(item.sub_topic)
+            if skill_id:
+                # burada compute_theta_for_item senin MLE veya MAP fonksiyonun
+                student.set_theta(skill_id, map_estimate(item, response))
     used_item_ids.add(item.id)
     current_theta = student.update_theta_general()
 
@@ -61,7 +73,8 @@ while True:
     subtopic_thetas = student.update_subtopic_thetas()
     print(item.sub_topic in G.nodes)
     print(item.sub_topic)
-    for skill_id in subtopic_thetas:
+
+    for skill_id in student.theta_topic:
         propagate_theta(G, student, skill_id)
 
     for topic, theta in subtopic_thetas.items():
